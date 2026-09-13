@@ -23,10 +23,23 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
         if (req.method === 'GET' && id) {
 
 
+            if (isNaN(id)) {
+                res.writeHead(400, { "content-type": "application/json" })
+                res.end(JSON.stringify({ message: "Invalid Item ID" }))
+                return
+            }
+
             const item = getItemById(id)
 
-            res.writeHead(item ? 200 : 404, { "content-type": "application/json" })
-            res.end(JSON.stringify(item || { message: "Not Found" }))
+            if (!item) {
+                res.writeHead(404, { "content-type": "application/json" })
+                res.end(JSON.stringify({ message: "Item not found" }))
+                return
+            }
+
+
+            res.writeHead(200, { "content-type": "application/json" })
+            res.end(JSON.stringify(item))
             return
 
         }
@@ -46,61 +59,67 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
             req.on("end", () => {
 
-                const { name, quantity, purchased } = JSON.parse(body)
-                const newItem = addItem(name, quantity, purchased)
+                try {
+                    const { name, quantity, purchased } = JSON.parse(body)
+                    const newItem = addItem(name, quantity, purchased)
 
-                res.writeHead(201, { "content-type": "application/json" })
-                res.end(JSON.stringify(newItem))
-
+                    res.writeHead(201, { "content-type": "application/json" })
+                    res.end(JSON.stringify(newItem))
+                } catch (error) {
+                    res.writeHead(400, { "content-type": "application/json" })
+                    res.end(JSON.stringify({ message: "Invalid JSON payload" }))
+                }
             })
 
             return
         }
 
         if (req.method === "PUT" && id) {
+            if (isNaN(id)) {
+                res.writeHead(400, { "content-type": "application/json" })
+                res.end(JSON.stringify({ message: "Invalid Item ID" }))
+                return
+            }
 
             let body = ""
-
             req.on("data", (chunk) => {
                 body += chunk.toString()
             })
-
             req.on("end", () => {
-                const { name, quantity, purchased } = JSON.parse(body)
+                try {
+                    const { name, quantity, purchased } = JSON.parse(body)
+                    const updatedItem = updateItem(id, name, quantity, purchased)
 
-                const updatedItem = updateItem(
-                    id,
-                    name,
-                    quantity,
-                    purchased
-                )
-
-                res.writeHead(updatedItem ? 200 : 404, {
-                    "content-type": "application/json"
-                })
-
-                res.end(JSON.stringify(
-                    updatedItem || { message: "Item not found" }
-                ))
+                    res.writeHead(updatedItem ? 200 : 404, {
+                        "content-type": "application/json"
+                    })
+                    res.end(JSON.stringify(
+                        updatedItem || { message: "Item not found" }
+                    ))
+                } catch (error) {
+                    res.writeHead(400, { "content-type": "application/json" })
+                    res.end(JSON.stringify({ message: "Invalid JSON payload" }))
+                }
             })
-
             return
         }
-
         if (req.method === "DELETE" && id) {
+            if (isNaN(id)) {
+                res.writeHead(400, { "content-type": "application/json" })
+                res.end(JSON.stringify({ message: "Invalid Item ID" }))
+                return
+            }
 
             const deleted = deleteItem(id)
 
             res.writeHead(deleted ? 200 : 404, {
                 "content-type": "application/json"
             })
-
             res.end(JSON.stringify(
                 deleted
                     ? { message: "Item deleted successfully" }
                     : { message: "Item not found" }
             ))
-
             return
         }
     }
