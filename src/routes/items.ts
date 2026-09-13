@@ -61,8 +61,14 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
                 try {
                     const { name, quantity, purchased } = JSON.parse(body)
-                    const newItem = addItem(name, quantity, purchased)
 
+                    if(!name || typeof name !== 'string' || !quantity || typeof quantity !== 'number' || typeof purchased !== 'boolean') {
+                        res.writeHead(400, { "content-type": "application/json" })
+                        res.end(JSON.stringify({ message: "Invalid item data" }))
+                        return
+                    }
+
+                    git statusconst newItem = addItem(name, quantity, purchased)
                     res.writeHead(201, { "content-type": "application/json" })
                     res.end(JSON.stringify(newItem))
                 } catch (error) {
@@ -88,6 +94,15 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
             req.on("end", () => {
                 try {
                     const { name, quantity, purchased } = JSON.parse(body)
+
+                    if (name === undefined || typeof name !== 'string' ||
+                        quantity === undefined || typeof quantity !== 'number' ||
+                        purchased === undefined || typeof purchased !== 'boolean') {
+                        res.writeHead(400, { "content-type": "application/json" })
+                        res.end(JSON.stringify({ message: "Invalid item data" }))
+                        return
+                    }
+
                     const updatedItem = updateItem(id, name, quantity, purchased)
 
                     res.writeHead(updatedItem ? 200 : 404, {
