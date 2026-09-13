@@ -1,6 +1,11 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { addItem, getItems, getItemById, updateItem, deleteItem } from '../controllers/items'
 
+const sendErrorResponse = (res: ServerResponse, statusCode: number, message: string) => {
+    res.writeHead(statusCode, { "content-type": "application/json" })
+    res.end(JSON.stringify({ message }))
+}
+
 export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
     if (req.url?.startsWith("/items")) {
@@ -24,16 +29,14 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
 
             if (isNaN(id)) {
-                res.writeHead(400, { "content-type": "application/json" })
-                res.end(JSON.stringify({ message: "Invalid Item ID" }))
+                sendErrorResponse(res, 400, "Invalid Item ID")
                 return
             }
 
             const item = getItemById(id)
 
             if (!item) {
-                res.writeHead(404, { "content-type": "application/json" })
-                res.end(JSON.stringify({ message: "Item not found" }))
+                sendErrorResponse(res, 404, "Item not found")
                 return
             }
 
@@ -62,9 +65,8 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                 try {
                     const { name, quantity, purchased } = JSON.parse(body)
 
-                    if(!name || typeof name !== 'string' || !quantity || typeof quantity !== 'number' || typeof purchased !== 'boolean') {
-                        res.writeHead(400, { "content-type": "application/json" })
-                        res.end(JSON.stringify({ message: "Invalid item data" }))
+                    if (!name || typeof name !== 'string' || !quantity || typeof quantity !== 'number' || typeof purchased !== 'boolean') {
+                        sendErrorResponse(res, 400, "Invalid item data")
                         return
                     }
 
@@ -72,8 +74,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                     res.writeHead(201, { "content-type": "application/json" })
                     res.end(JSON.stringify(newItem))
                 } catch (error) {
-                    res.writeHead(400, { "content-type": "application/json" })
-                    res.end(JSON.stringify({ message: "Invalid JSON payload" }))
+                    sendErrorResponse(res, 400, "Invalid JSON payload")
                 }
             })
 
@@ -82,8 +83,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
         if (req.method === "PUT" && id) {
             if (isNaN(id)) {
-                res.writeHead(400, { "content-type": "application/json" })
-                res.end(JSON.stringify({ message: "Invalid Item ID" }))
+                sendErrorResponse(res, 400, "Invalid Item ID")
                 return
             }
 
@@ -98,30 +98,27 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                     if (name === undefined || typeof name !== 'string' ||
                         quantity === undefined || typeof quantity !== 'number' ||
                         purchased === undefined || typeof purchased !== 'boolean') {
-                        res.writeHead(400, { "content-type": "application/json" })
-                        res.end(JSON.stringify({ message: "Invalid item data" }))
+                        sendErrorResponse(res, 400, "Invalid item data")
                         return
                     }
 
                     const updatedItem = updateItem(id, name, quantity, purchased)
 
-                    res.writeHead(updatedItem ? 200 : 404, {
-                        "content-type": "application/json"
-                    })
-                    res.end(JSON.stringify(
-                        updatedItem || { message: "Item not found" }
-                    ))
+                    if (updatedItem) {
+                        res.writeHead(200, { "content-type": "application/json" })
+                        res.end(JSON.stringify(updatedItem))
+                    } else {
+                        sendErrorResponse(res, 404, "Item not found")
+                    }
                 } catch (error) {
-                    res.writeHead(400, { "content-type": "application/json" })
-                    res.end(JSON.stringify({ message: "Invalid JSON payload" }))
+                    sendErrorResponse(res, 400, "Invalid JSON payload")
                 }
             })
             return
         }
         if (req.method === "DELETE" && id) {
             if (isNaN(id)) {
-                res.writeHead(400, { "content-type": "application/json" })
-                res.end(JSON.stringify({ message: "Invalid Item ID" }))
+                sendErrorResponse(res, 400, "Invalid Item ID")
                 return
             }
 
@@ -131,8 +128,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                 res.writeHead(204)
                 res.end()
             } else {
-                res.writeHead(404, { "content-type": "application/json" })
-                res.end(JSON.stringify({ message: "Item not found" }))
+                sendErrorResponse(res, 404, "Item not found")
             }
             return
         }
