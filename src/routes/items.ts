@@ -68,7 +68,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                         return
                     }
 
-                    git statusconst newItem = addItem(name, quantity, purchased)
+                    const newItem = addItem(name, quantity, purchased)
                     res.writeHead(201, { "content-type": "application/json" })
                     res.end(JSON.stringify(newItem))
                 } catch (error) {
@@ -127,14 +127,13 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
             const deleted = deleteItem(id)
 
-            res.writeHead(deleted ? 200 : 404, {
-                "content-type": "application/json"
-            })
-            res.end(JSON.stringify(
-                deleted
-                    ? { message: "Item deleted successfully" }
-                    : { message: "Item not found" }
-            ))
+            if (deleted) {
+                res.writeHead(204)
+                res.end()
+            } else {
+                res.writeHead(404, { "content-type": "application/json" })
+                res.end(JSON.stringify({ message: "Item not found" }))
+            }
             return
         }
     }
