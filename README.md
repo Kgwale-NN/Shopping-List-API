@@ -116,8 +116,8 @@ Shopping-List-API/
 |   |   `-- items.ts
 |   |-- routes/
 |   |   `-- items.ts
-|   |-- types/
-|   |   `-- items.ts
+|   |-- models/
+|   |   `-- item.ts
 |   `-- server.ts
 |-- .gitignore
 |-- package.json

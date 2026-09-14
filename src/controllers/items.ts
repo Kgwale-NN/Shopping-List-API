@@ -1,4 +1,4 @@
-import { Item } from '../types/items'
+import { Item } from '../models/item'
 
 let items: Item[] = []
 let currentId = 1
