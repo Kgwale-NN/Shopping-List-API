@@ -16,22 +16,26 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
         console.log(parts, 'request url parts')
 
-        const id = parts[2] ? parseInt(parts[2]) : undefined
+        if (parts[1] !== "items" || parts.length > 3 || (parts.length === 3 && !parts[2])) {
+            sendErrorResponse(res, 404, "Route not found")
+            return
+        }
 
-        if (req.method === 'GET' && !id) {
+        const id = parts[2] === undefined ? undefined : Number(parts[2])
+
+        if (id !== undefined && (!Number.isInteger(id) || id <= 0)) {
+            sendErrorResponse(res, 400, "Invalid Item ID")
+            return
+        }
+
+        if (req.method === 'GET' && id === undefined) {
 
             res.writeHead(200, { "content-type": "application/json" })
             res.end(JSON.stringify(getItems()))
             return
         }
 
-        if (req.method === 'GET' && id) {
-
-
-            if (isNaN(id)) {
-                sendErrorResponse(res, 400, "Invalid Item ID")
-                return
-            }
+        if (req.method === 'GET' && id !== undefined) {
 
             const item = getItemById(id)
 
@@ -47,7 +51,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
 
         }
 
-        if (req.method === "POST") {
+        if (req.method === "POST" && id === undefined) {
 
             let body = ""
 
@@ -81,11 +85,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
             return
         }
 
-        if (req.method === "PUT" && id) {
-            if (isNaN(id)) {
-                sendErrorResponse(res, 400, "Invalid Item ID")
-                return
-            }
+        if (req.method === "PUT" && id !== undefined) {
 
             let body = ""
             req.on("data", (chunk) => {
@@ -116,11 +116,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
             })
             return
         }
-        if (req.method === "DELETE" && id) {
-            if (isNaN(id)) {
-                sendErrorResponse(res, 400, "Invalid Item ID")
-                return
-            }
+        if (req.method === "DELETE" && id !== undefined) {
 
             const deleted = deleteItem(id)
 
@@ -132,5 +128,7 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
             }
             return
         }
+
+        sendErrorResponse(res, 404, "Route not found")
     }
 }
