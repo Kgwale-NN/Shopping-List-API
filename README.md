@@ -65,7 +65,7 @@ Each shopping-list item has the following shape:
 - [x] Connect the item routes to the server
 - [x] Validate missing or incorrect request fields
 - [x] Return `400` for malformed JSON
-- [ ] Add automated tests
+- [x] Add automated route tests
 
 ## Task breakdown
 
@@ -193,6 +193,12 @@ npm start
 
 Runs the server with ts-node.
 
+```bash
+npm test
+```
+
+Runs the automated API route tests.
+
 ## Using the API
 
 ### Get all items
@@ -311,7 +317,7 @@ Only expose this learning project on a trusted local network. It does not curren
 - Data is stored only in memory.
 - All items are lost whenever the server restarts.
 - The API does not use a database yet.
-- Basic input validation is implemented; automated tests are still planned.
+- Basic input validation and automated route tests are implemented.
 - The API is intended for learning and local development, not production use.
 
 ## Author
