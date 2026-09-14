@@ -69,7 +69,9 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                 try {
                     const { name, quantity, purchased } = JSON.parse(body)
 
-                    if (!name || typeof name !== 'string' || !quantity || typeof quantity !== 'number' || typeof purchased !== 'boolean') {
+                    if (typeof name !== 'string' || name.trim() === '' ||
+                        typeof quantity !== 'number' || !Number.isFinite(quantity) || quantity <= 0 ||
+                        typeof purchased !== 'boolean') {
                         sendErrorResponse(res, 400, "Invalid item data")
                         return
                     }
@@ -95,9 +97,9 @@ export const itemsRoutes = (req: IncomingMessage, res: ServerResponse) => {
                 try {
                     const { name, quantity, purchased } = JSON.parse(body)
 
-                    if (name === undefined || typeof name !== 'string' ||
-                        quantity === undefined || typeof quantity !== 'number' ||
-                        purchased === undefined || typeof purchased !== 'boolean') {
+                    if (typeof name !== 'string' || name.trim() === '' ||
+                        typeof quantity !== 'number' || !Number.isFinite(quantity) || quantity <= 0 ||
+                        typeof purchased !== 'boolean') {
                         sendErrorResponse(res, 400, "Invalid item data")
                         return
                     }
