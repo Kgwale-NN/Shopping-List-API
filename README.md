@@ -63,8 +63,8 @@ Each shopping-list item has the following shape:
 - [x] Create item controller functions
 - [x] Add `GET`, `POST`, `PUT`, and `DELETE` route handling
 - [x] Connect the item routes to the server
-- [ ] Validate missing or incorrect request fields
-- [ ] Handle malformed JSON safely
+- [x] Validate missing or incorrect request fields
+- [x] Return `400` for malformed JSON
 - [ ] Add automated tests
 
 ## Task breakdown
@@ -251,13 +251,7 @@ A successful request returns status `200 OK` and the updated item. An unknown ID
 DELETE http://localhost:2000/items/1
 ```
 
-A successful request returns:
-
-```json
-{
-  "message": "Item deleted successfully"
-}
-```
+A successful request returns `204 No Content` with an empty response body. An unknown ID returns `404 Not Found`.
 
 ## Testing with Postman
 
@@ -317,7 +311,7 @@ Only expose this learning project on a trusted local network. It does not curren
 - Data is stored only in memory.
 - All items are lost whenever the server restarts.
 - The API does not use a database yet.
-- Input validation and automated tests are still planned.
+- Basic input validation is implemented; automated tests are still planned.
 - The API is intended for learning and local development, not production use.
 
 ## Author
