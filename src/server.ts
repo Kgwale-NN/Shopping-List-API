@@ -14,8 +14,8 @@ const handleListener = (req:IncomingMessage, res:ServerResponse)=> {
 
   }else{
 
-       res.writeHead(200 , {"content-type":"application/json"})
-       res.end(JSON.stringify({message : "Hello World"}))
+       res.writeHead(404, {"content-type":"application/json"})
+       res.end(JSON.stringify({message: "Route not found"}))
   }
 }
 
